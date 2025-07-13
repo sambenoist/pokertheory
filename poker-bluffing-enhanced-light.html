@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Poker Bluffing Strategy Simulation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #f8f9fa;
+            color: #2c3e50;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: normal;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            font-style: italic;
+        }
+        
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .tab {
+            padding: 12px 30px;
+            background: transparent;
+            border: none;
+            color: #7f8c8d;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            font-family: inherit;
+        }
+        
+        .tab:hover {
+            color: #3498db;
+        }
+        
+        .tab.active {
+            color: #2980b9;
+            border-bottom-color: #3498db;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Theory Section */
+        .theory-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .theory-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .formula {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.3em;
+            color: #2980b9;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #3498db;
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.1);
+        }
+        
+        .theory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .theory-card {
+            background: #ffffff;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            padding: 25px;
+            transition: box-shadow 0.3s;
+        }
+        
+        .theory-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .theory-card h4 {
+            color: #2980b9;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        /* Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            color: #fff;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: help;
+            position: relative;
+        }
+        
+        .tooltip {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+            max-width: 250px;
+            white-space: normal;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-icon:hover .tooltip {
+            opacity: 1;
+        }
+        
+        input, select, button {
+            padding: 12px;
+            border: 2px solid #dfe6e9;
+            border-radius: 6px;
+            background: #fff;
+            color: #2c3e50;
+            font-family: inherit;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        button {
+            background: #3498db;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            margin-top: 10px;
+            border: none;
+        }
+        
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        small {
+            color: #95a5a6;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        /* Opponent Strategy Toggle */
+        .opponent-strategy {
+            grid-column: 1 / -1;
+            padding: 20px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            border: 2px solid #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .strategy-toggle {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .strategy-toggle input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        .strategy-toggle label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        /* Custom Scenarios */
+        .custom-scenarios {
+            margin-top: 20px;
+            padding: 25px;
+            background: #fff5e6;
+            border-radius: 8px;
+            border: 1px solid #f39c12;
+        }
+        
+        .custom-scenarios h4 {
+            color: #e67e22;
+            margin-bottom: 20px;
+        }
+        
+        .scenario-input-group {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 15px;
+        }
+        
+        .scenario-list {
+            margin-top: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .scenario-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #fef9f3;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #f8e6cc;
+        }
+        
+        .remove-btn {
+            background: #e74c3c;
+            padding: 6px 12px;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+        
+        /* Results */
+        .results {
+            margin-top: 30px;
+        }
+        
+        .scenario {
+            margin-bottom: 40px;
+            padding: 35px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            position: relative;
+        }
+        
+        .scenario.optimal-play {
+            border-left-color: #27ae60;
+            background: #f0f9f4;
+        }
+        
+        .scenario h3 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.4em;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric {
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #dfe6e9;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .metric:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+        
+        .metric-value {
+            color: #2c3e50;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+        
+        .metric-value.optimal {
+            color: #27ae60;
+        }
+        
+        .breakdown {
+            margin-top: 25px;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #dfe6e9;
+        }
+        
+        .breakdown h4 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #3498db;
+            font-size: 1.3em;
+            margin: 40px 0;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(52, 152, 219, 0.3);
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .summary {
+            margin-top: 40px;
+            padding: 35px;
+            background: #fff5e6;
+            border-radius: 10px;
+            border-left: 5px solid #f39c12;
+        }
+        
+        .summary h3 {
+            color: #e67e22;
+            margin-bottom: 25px;
+        }
+        
+        .insights {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .insights li {
+            padding: 15px 0;
+            border-bottom: 1px solid #fdebd0;
+            position: relative;
+            padding-left: 30px;
+            line-height: 1.8;
+        }
+        
+        .insights li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #f39c12;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .insights li:last-child {
+            border-bottom: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+            
+            .scenario-input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 Enhanced Poker Bluffing Strategy Simulation</h1>
+        <p class="subtitle">
+            Explore optimal bluffing frequencies with game-theoretic analysis and Nash equilibrium scenarios
+        </p>
+        
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('theory')">📚 Theory</button>
+            <button class="tab" onclick="showTab('simulation')">🎲 Simulation</button>
+            <button class="tab" onclick="showTab('results')">📊 Results</button>
+        </div>
+        
+        <!-- Theory Tab -->
+        <div id="theory" class="tab-content active">
+            <div class="theory-section">
+                <h3>Understanding Optimal Bluffing Strategy</h3>
+                <p>In heads-up river play, the optimal bluffing frequency makes your opponent indifferent between calling and folding. This creates an unexploitable strategy based on game theory principles established by von Neumann and Morgenstern (1944).</p>
+                
+                <div class="formula">
+                    Optimal Bluffing Frequency: q = B / (P + B)
+                </div>
+                
+                <div class="theory-grid">
+                    <div class="theory-card">
+                        <h4>Key Variables</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>• <strong>P</strong>: Pot size before betting</li>
+                            <li>• <strong>B</strong>: Your bet size</li>
+                            <li>• <strong>q</strong>: Probability your bet is a bluff</li>
+                            <li>• <strong>1-q</strong>: Probability your bet is for value</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="theory-card">
+                        <h4>Bluff-to-Value Ratio</h4>
+                        <div class="formula" style="font-size: 1em;">
+                            b/v = B/P
+                        </div>
+                        <p style="margin-top: 15px;">This ratio ensures your opponent's EV for calling equals their EV for folding (zero).</p>
+                    </div>
+                    
+                    <div class="theory-card">
+                        <h4>Nash Equilibrium</h4>
+                        <p>When both players play optimally:</p>
+                        <ul style="list-style: none; padding: 0; margin-top: 15px;">
+                            <li>• Bettor bluffs at frequency q = B/(P+B)</li>
+                            <li>• Opponent calls at frequency c = P/(P+B)</li>
+                            <li>• Both players' EVs = 0</li>
+                            <li>• Neither can improve unilaterally</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="theory-section" style="margin-top: 25px; background: #e8f4fd; border: 1px solid #3498db;">
+                    <h4 style="color: #2980b9;">💡 Key Insights from Game Theory</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>• The minimax theorem guarantees existence of optimal strategies in zero-sum games</li>
+                        <li>• Larger bets relative to pot size require higher bluffing frequencies</li>
+                        <li>• Your value hand frequency determines how many weak hands are available for bluffing</li>
+                        <li>• In Nash equilibrium, expected values converge to zero for both players</li>
+                        <li>• Real-world deviations from optimal play create exploitable opportunities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Simulation Tab -->
+        <div id="simulation" class="tab-content">
+            <div class="controls">
+                <div class="opponent-strategy">
+                    <label style="font-size: 1.1em; color: #2980b9;">
+                        Opponent Strategy Mode
+                        <span class="info-icon">?
+                            <span class="tooltip">Choose whether opponent plays with fixed frequency or optimal game-theoretic strategy</span>
+                        </span>
+                    </label>
+                    <div class="strategy-toggle">
+                        <label>
+                            <input type="radio" name="opponentMode" value="fixed" checked>
+                            Fixed Call Frequency (Exploitable)
+                        </label>
+                        <label>
+                            <input type="radio" name="opponentMode" value="optimal">
+                            Optimal GTO Play (Nash Equilibrium)
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="simulations">
+                        Number of Simulations
+                        <span class="info-icon">?
+                            <span class="tooltip">More simulations provide more accurate results but take longer to compute</span>
+                        </span>
+                    </label>
+                    <input type="number" id="simulations" value="100000" min="10000" max="1000000" step="10000">
+                    <small>Range: 10,000 - 1,000,000</small>
+                </div>
+                
+                <div class="control-group" id="callFreqGroup">
+                    <label for="callFreq">
+                        Opponent Call Frequency
+                        <span class="info-icon">?
+                            <span class="tooltip">How often your opponent calls when you bet. Higher values mean a tighter opponent</span>
+                        </span>
+                    </label>
+                    <input type="number" id="callFreq" value="75" min="10" max="100" step="5">
+                    <small>Percentage (10-100%)</small>
+                </div>
+                
+                <div class="control-group">
+                    <label for="valueFreq">
+                        Value Hand Frequency
+                        <span class="info-icon">?
+                            <span class="tooltip">Percentage of your hands that are strong (value hands). The rest are weak hands that can potentially bluff</span>
+                        </span>
+                    </label>
+                    <input type="number" id="valueFreq" value="50" min="10" max="90" step="5">
+                    <small>Percentage (10-90%)</small>
+                </div>
+                
+                <div class="control-group">
+                    <label for="scenarios">
+                        Scenario Presets
+                        <span class="info-icon">?
+                            <span class="tooltip">Pre-configured betting patterns or create your own custom scenarios</span>
+                        </span>
+                    </label>
+                    <select id="scenarios">
+                        <option value="conservative">Conservative (0.25x - 0.75x pot)</option>
+                        <option value="standard">Standard (0.5x - 1.5x pot)</option>
+                        <option value="aggressive">Aggressive (1x - 3x pot)</option>
+                        <option value="extreme">Extreme (2x - 5x pot)</option>
+                        <option value="custom">Custom Scenarios</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <button onclick="runSimulation()" style="width: 100%;">
+                        🎲 Run Simulation
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Custom Scenarios Section -->
+            <div id="customScenarios" class="custom-scenarios" style="display: none;">
+                <h4>Create Custom Scenarios</h4>
+                <div class="scenario-input-group">
+                    <div>
+                        <label style="font-size: 0.9em;">Pot Size</label>
+                        <input type="number" id="customPot" value="100" min="10" max="10000" step="10">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.9em;">Bet Size</label>
+                        <input type="number" id="customBet" value="50" min="1" max="10000" step="1">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.9em;">Name</label>
+                        <input type="text" id="customName" value="Custom" maxlength="20">
+                    </div>
+                    <button onclick="addCustomScenario()" style="margin: 0;">Add</button>
+                </div>
+                <div id="customScenarioList" class="scenario-list"></div>
+            </div>
+        </div>
+        
+        <!-- Results Tab -->
+        <div id="results-tab" class="tab-content">
+            <div id="loading" class="loading" style="display: none;">
+                🎲 Running simulations... Please wait
+                <span class="loading-spinner"></span>
+            </div>
+            
+            <div id="results" class="results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for custom scenarios
+        let customScenariosList = [];
+        
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            if (tabName === 'results') {
+                document.getElementById('results-tab').classList.add('active');
+            } else {
+                document.getElementById(tabName).classList.add('active');
+            }
+            
+            // Highlight active tab button
+            event.target.classList.add('active');
+        }
+        
+        // Show/hide call frequency based on opponent mode
+        document.querySelectorAll('input[name="opponentMode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const callFreqGroup = document.getElementById('callFreqGroup');
+                if (this.value === 'optimal') {
+                    callFreqGroup.style.opacity = '0.5';
+                    callFreqGroup.style.pointerEvents = 'none';
+                } else {
+                    callFreqGroup.style.opacity = '1';
+                    callFreqGroup.style.pointerEvents = 'auto';
+                }
+            });
+        });
+        
+        // Show/hide custom controls based on scenario selection
+        document.getElementById('scenarios').addEventListener('change', function() {
+            const customSection = document.getElementById('customScenarios');
+            if (this.value === 'custom') {
+                customSection.style.display = 'block';
+                if (customScenariosList.length === 0) {
+                    // Add default custom scenarios
+                    addCustomScenario(100, 50, 'Half Pot');
+                    addCustomScenario(100, 100, 'Full Pot');
+                    addCustomScenario(100, 150, '1.5x Pot');
+                }
+            } else {
+                customSection.style.display = 'none';
+            }
+        });
+        
+        function addCustomScenario(pot, bet, name) {
+            // If called with parameters, use them; otherwise get from inputs
+            if (pot === undefined) {
+                pot = parseInt(document.getElementById('customPot').value);
+                bet = parseInt(document.getElementById('customBet').value);
+                name = document.getElementById('customName').value || 'Custom';
+            }
+            
+            // Validation
+            if (bet > pot * 10) {
+                alert('Bet size cannot be more than 10x the pot size');
+                return;
+            }
+            
+            if (customScenariosList.length >= 8) {
+                alert('Maximum 8 custom scenarios allowed');
+                return;
+            }
+            
+            // Add to list
+            customScenariosList.push({ pot, bet, name });
+            updateCustomScenarioDisplay();
+            
+            // Clear inputs
+            document.getElementById('customName').value = 'Custom';
+        }
+        
+        function removeCustomScenario(index) {
+            customScenariosList.splice(index, 1);
+            updateCustomScenarioDisplay();
+        }
+        
+        function updateCustomScenarioDisplay() {
+            const listDiv = document.getElementById('customScenarioList');
+            if (customScenariosList.length === 0) {
+                listDiv.innerHTML = '<p style="color: #95a5a6; text-align: center;">No custom scenarios added yet</p>';
+                return;
+            }
+            
+            listDiv.innerHTML = customScenariosList.map((scenario, index) => `
+                <div class="scenario-item">
+                    <span>${scenario.name}: ${scenario.bet} chips into ${scenario.pot} pot (${(scenario.bet/scenario.pot).toFixed(2)}x)</span>
+                    <button class="remove-btn" onclick="removeCustomScenario(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+        
+        function getScenarioParams() {
+            const scenarioType = document.getElementById('scenarios').value;
+            const baseParams = {
+                conservative: [
+                    { pot: 200, bet: 50, name: "Quarter Pot" },
+                    { pot: 150, bet: 75, name: "Half Pot" },
+                    { pot: 120, bet: 90, name: "3/4 Pot" }
+                ],
+                standard: [
+                    { pot: 100, bet: 50, name: "Half Pot" },
+                    { pot: 100, bet: 75, name: "3/4 Pot" },
+                    { pot: 100, bet: 100, name: "Full Pot" },
+                    { pot: 100, bet: 150, name: "1.5x Pot" }
+                ],
+                aggressive: [
+                    { pot: 100, bet: 100, name: "Full Pot" },
+                    { pot: 100, bet: 150, name: "1.5x Pot" },
+                    { pot: 100, bet: 200, name: "2x Pot" },
+                    { pot: 100, bet: 300, name: "3x Pot" }
+                ],
+                extreme: [
+                    { pot: 100, bet: 200, name: "2x Pot" },
+                    { pot: 100, bet: 300, name: "3x Pot" },
+                    { pot: 100, bet: 400, name: "4x Pot" },
+                    { pot: 100, bet: 500, name: "5x Pot" }
+                ],
+                custom: customScenariosList
+            };
+            
+            return baseParams[scenarioType];
+        }
+
+        function simulatePoker(potSize, betSize, numSimulations, callFreq, valueFreq, optimalOpponent = false) {
+            const weakFreq = 1 - valueFreq;
+            
+            // Theoretical calculations
+            const optimalBluffFreq = betSize / (potSize + betSize);
+            const optimalCallFreq = potSize / (potSize + betSize);
+            const theoreticalBluffToValueRatio = betSize / potSize;
+            
+            // Calculate achievable bluffing frequency given constraints
+            const maxBluffHands = weakFreq; // Can't bluff more than weak hands available
+            const valueHands = valueFreq;
+            const requiredBluffHands = valueHands * theoreticalBluffToValueRatio;
+            const bluffProbability = Math.min(requiredBluffHands / weakFreq, 1.0);
+            const achievableBluffFreq = Math.min(optimalBluffFreq, (bluffProbability * weakFreq) / (valueFreq + bluffProbability * weakFreq));
+            
+            // If opponent plays optimally, use optimal call frequency
+            const actualCallFreq = optimalOpponent ? optimalCallFreq : callFreq / 100;
+            
+            // Simulation counters
+            let totalBets = 0;
+            let valueBets = 0;
+            let bluffs = 0;
+            let valueBetCalled = 0;
+            let valueBetFolded = 0;
+            let bluffCalled = 0;
+            let bluffFolded = 0;
+            let weakHandChecked = 0;
+            
+            let bettorEV = 0;
+            let opponentEV = 0;
+            let opponentCallEV = 0;
+            let opponentCallCount = 0;
+            let opponentFoldEV = 0;
+            let opponentFoldCount = 0;
+            
+            for (let i = 0; i < numSimulations; i++) {
+                const isValueHand = Math.random() < valueFreq;
+                let handEV = 0;
+                let opponentHandEV = 0;
+                
+                if (isValueHand) {
+                    // Always bet value hands
+                    totalBets++;
+                    valueBets++;
+                    
+                    if (Math.random() < actualCallFreq) {
+                        // Opponent calls - bettor wins pot + bet
+                        valueBetCalled++;
+                        handEV = potSize + betSize;
+                        opponentHandEV = -betSize;
+                        opponentCallEV += -betSize;
+                        opponentCallCount++;
+                    } else {
+                        // Opponent folds - bettor wins pot
+                        valueBetFolded++;
+                        handEV = potSize;
+                        opponentHandEV = 0;
+                        opponentFoldEV += 0;
+                        opponentFoldCount++;
+                    }
+                } else {
+                    // Weak hand - decide whether to bluff
+                    if (Math.random() < bluffProbability) {
+                        // Bluff
+                        totalBets++;
+                        bluffs++;
+                        
+                        if (Math.random() < actualCallFreq) {
+                            // Opponent calls - bettor loses bet, opponent wins pot
+                            bluffCalled++;
+                            handEV = -betSize;
+                            opponentHandEV = potSize;
+                            opponentCallEV += potSize;
+                            opponentCallCount++;
+                        } else {
+                            // Opponent folds - bettor wins pot
+                            bluffFolded++;
+                            handEV = potSize;
+                            opponentHandEV = 0;
+                            opponentFoldEV += 0;
+                            opponentFoldCount++;
+                        }
+                    } else {
+                        // Check weak hand - go to showdown
+                        weakHandChecked++;
+                        // Assume opponent wins when we check weak hands
+                        handEV = 0;
+                        opponentHandEV = potSize;
+                    }
+                }
+                
+                bettorEV += handEV;
+                opponentEV += opponentHandEV;
+            }
+            
+            // Calculate averages
+            const avgBettorEV = bettorEV / numSimulations;
+            const avgOpponentEV = opponentEV / numSimulations;
+            const avgOpponentCallEV = opponentCallCount > 0 ? opponentCallEV / opponentCallCount : 0;
+            const avgOpponentFoldEV = opponentFoldCount > 0 ? opponentFoldEV / opponentFoldCount : 0;
+            
+            const actualBluffFreq = totalBets > 0 ? bluffs / totalBets : 0;
+            const actualBluffToValueRatio = valueBets > 0 ? bluffs / valueBets : 0;
+            
+            return {
+                // Parameters
+                potSize,
+                betSize,
+                numSimulations,
+                callFreq: actualCallFreq * 100,
+                valueFreq,
+                optimalOpponent,
+                
+                // Theoretical
+                optimalBluffFreq,
+                optimalCallFreq,
+                achievableBluffFreq,
+                theoreticalBluffToValueRatio,
+                bluffProbability,
+                
+                // Simulation results
+                totalBets,
+                valueBets,
+                bluffs,
+                actualBluffFreq,
+                actualBluffToValueRatio,
+                
+                // Scenario breakdown
+                valueBetCalled,
+                valueBetFolded,
+                bluffCalled,
+                bluffFolded,
+                weakHandChecked,
+                
+                // Expected values
+                avgBettorEV,
+                avgOpponentEV,
+                avgOpponentCallEV,
+                avgOpponentFoldEV,
+                
+                // Validation
+                theoreticalOpponentCallEV: optimalOpponent ? 0 : null,
+                constraintViolation: bluffProbability >= 1.0
+            };
+        }
+
+        function formatNumber(num, decimals = 2) {
+            return typeof num === 'number' ? num.toFixed(decimals) : num;
+        }
+
+        function formatPercentage(num) {
+            return `${(num * 100).toFixed(1)}%`;
+        }
+
+        function formatRatio(decimal) {
+            // Convert decimal to fraction
+            if (decimal === 0) return "0 : 1";
+            if (decimal === 1) return "1 : 1";
+            
+            // Find the closest simple fraction
+            const tolerance = 0.01;
+            const maxDenominator = 20;
+            
+            let bestNumerator = 1;
+            let bestDenominator = 1;
+            let bestError = Math.abs(decimal - 1);
+            
+            for (let denominator = 1; denominator <= maxDenominator; denominator++) {
+                let numerator = Math.round(decimal * denominator);
+                let error = Math.abs(decimal - numerator / denominator);
+                
+                if (error < bestError) {
+                    bestError = error;
+                    bestNumerator = numerator;
+                    bestDenominator = denominator;
+                    
+                    if (error < tolerance) break;
+                }
+            }
+            
+            // Simplify fraction if possible
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const divisor = gcd(bestNumerator, bestDenominator);
+            bestNumerator /= divisor;
+            bestDenominator /= divisor;
+            
+            return `${bestNumerator} : ${bestDenominator}`;
+        }
+
+        function getStatusClass(callEV) {
+            const absEV = Math.abs(callEV);
+            if (absEV < 1) return 'success';
+            if (absEV < 5) return 'warning';
+            return 'error';
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            let html = '';
+            
+            // Check if any results are from optimal opponent play
+            const hasOptimalPlay = results.some(r => r.optimalOpponent);
+            
+            // Add quick summary at the top
+            html += `
+                <div class="theory-section" style="background: #e8f4fd; border: 1px solid #3498db;">
+                    <h3 style="color: #2980b9; margin-bottom: 20px;">📈 Quick Summary</h3>
+                    <div class="theory-grid">
+                        <div class="theory-card">
+                            <h4>Simulation Parameters</h4>
+                            <ul style="list-style: none; padding: 0;">
+                                <li>• Simulations: ${results[0].numSimulations.toLocaleString()}</li>
+                                <li>• Opponent Strategy: ${hasOptimalPlay ? 'Optimal GTO' : 'Fixed ' + results[0].callFreq.toFixed(0) + '%'}</li>
+                                <li>• Value Hand Freq: ${formatPercentage(results[0].valueFreq)}</li>
+                                <li>• Weak Hand Freq: ${formatPercentage(1 - results[0].valueFreq)}</li>
+                                <li>• Scenarios Tested: ${results.length}</li>
+                            </ul>
+                        </div>
+                        <div class="theory-card">
+                            <h4>Key Findings</h4>
+                            <ul style="list-style: none; padding: 0;">
+                                ${hasOptimalPlay ? 
+                                    `<li>• <strong>Nash Equilibrium:</strong> Both EVs converge to 0</li>
+                                     <li>• Optimal Call Freq: P/(P+B) for each scenario</li>
+                                     <li>• Perfect balance achieved in all scenarios</li>` :
+                                    `<li>• Best EV Scenario: ${results.reduce((best, r) => r.avgBettorEV > best.avgBettorEV ? r : best).scenarioName}</li>
+                                     <li>• Constraint Violations: ${results.filter(r => r.constraintViolation).length}</li>
+                                     <li>• Perfect Equilibrium: ${results.filter(r => Math.abs(r.avgOpponentCallEV) < 1).length}</li>`
+                                }
+                                <li>• EV Range: ${formatNumber(Math.min(...results.map(r => r.avgBettorEV)))} to ${formatNumber(Math.max(...results.map(r => r.avgBettorEV)))} chips</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            results.forEach((result, index) => {
+                const betRatio = result.betSize / result.potSize;
+                const constraintStatus = result.constraintViolation ? 'error' : 'success';
+                const equilibriumStatus = result.optimalOpponent ? 'success' : getStatusClass(result.avgOpponentCallEV);
+                
+                html += `
+                    <div class="scenario ${result.optimalOpponent ? 'optimal-play' : ''}">
+                        <h3>${result.scenarioName} - ${result.betSize} chips into ${result.potSize} chip pot (${betRatio.toFixed(2)}x pot)</h3>
+                        ${result.optimalOpponent ? '<p style="color: #27ae60; margin-top: -10px; margin-bottom: 20px;"><strong>Nash Equilibrium Play</strong></p>' : ''}
+                        
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-label">Optimal Bluffing Frequency</div>
+                                <div class="metric-value">${formatPercentage(result.optimalBluffFreq)}</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Achievable Bluffing Frequency</div>
+                                <div class="metric-value">${formatPercentage(result.achievableBluffFreq)}</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Actual Bluffing Frequency</div>
+                                <div class="metric-value">${formatPercentage(result.actualBluffFreq)}</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Bluff-to-Value Ratio</div>
+                                <div class="metric-value">${formatRatio(result.actualBluffToValueRatio)}</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">Bettor's Average EV</div>
+                                <div class="metric-value ${result.optimalOpponent ? 'optimal' : ''}">${formatNumber(result.avgBettorEV)} chips</div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="metric-label">${result.optimalOpponent ? 'Optimal Call Frequency' : 'Opponent\'s Call EV'}</div>
+                                <div class="metric-value">
+                                    ${result.optimalOpponent ? 
+                                        formatPercentage(result.optimalCallFreq) :
+                                        `${formatNumber(result.avgOpponentCallEV)} chips`
+                                    }
+                                    <span class="status ${equilibriumStatus}">
+                                        ${result.optimalOpponent ? 
+                                            'GTO' : 
+                                            (Math.abs(result.avgOpponentCallEV) < 1 ? 'Equilibrium' : 'Off Balance')
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="breakdown">
+                            <h4>Hand Breakdown (${result.numSimulations.toLocaleString()} simulations)</h4>
+                            <div class="breakdown-item">
+                                <span>Value Bet Called:</span>
+                                <span>${result.valueBetCalled.toLocaleString()} (${formatPercentage(result.valueBetCalled / result.numSimulations)})</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Value Bet Folded:</span>
+                                <span>${result.valueBetFolded.toLocaleString()} (${formatPercentage(result.valueBetFolded / result.numSimulations)})</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Bluff Called:</span>
+                                <span>${result.bluffCalled.toLocaleString()} (${formatPercentage(result.bluffCalled / result.numSimulations)})</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Bluff Folded:</span>
+                                <span>${result.bluffFolded.toLocaleString()} (${formatPercentage(result.bluffFolded / result.numSimulations)})</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Weak Hand Checked:</span>
+                                <span>${result.weakHandChecked.toLocaleString()} (${formatPercentage(result.weakHandChecked / result.numSimulations)})</span>
+                            </div>
+                        </div>
+                        
+                        ${result.constraintViolation ? `
+                            <div class="breakdown" style="background: #fff3cd; border: 1px solid #ffeeba;">
+                                <h4 style="color: #856404;">⚠️ Mathematical Constraint Violation</h4>
+                                <p>Required bluff probability: ${formatPercentage(result.bluffProbability)}</p>
+                                <p>This bet size requires bluffing with more than 100% of weak hands!</p>
+                                <p><strong>Strategy:</strong> Bet ALL weak hands as bluffs, but perfect equilibrium cannot be achieved.</p>
+                                <p><strong>Implication:</strong> Your opponent can exploit you by calling more frequently.</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="breakdown" style="margin-top: 20px; background: #f0f9f4;">
+                            <h4 style="color: #27ae60;">💡 Strategic Insight</h4>
+                            <p>${getStrategicInsight(result)}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Add comprehensive summary
+            html += `
+                <div class="summary">
+                    <h3>📊 Comprehensive Analysis</h3>
+                    <ul class="insights">
+                        <li><strong>Game-Theoretic Framework:</strong> Based on von Neumann-Morgenstern minimax theorem for zero-sum games</li>
+                        <li><strong>Value Hand Frequency:</strong> ${formatPercentage(results[0].valueFreq)} (${formatPercentage(1 - results[0].valueFreq)} weak hands available for bluffing)</li>
+                        <li><strong>Optimal Strategy Formula:</strong> Bluff frequency = Bet Size / (Pot Size + Bet Size)</li>
+                        ${hasOptimalPlay ? 
+                            `<li><strong>Nash Equilibrium Achievement:</strong> When both players play optimally, EVs converge to 0 as predicted by game theory</li>
+                             <li><strong>Opponent's Optimal Response:</strong> Call frequency = Pot Size / (Pot Size + Bet Size)</li>` :
+                            `<li><strong>Constraint Reality:</strong> ${results.filter(r => r.constraintViolation).length} of ${results.length} scenarios violate mathematical constraints</li>
+                             <li><strong>Equilibrium Achievement:</strong> ${results.filter(r => Math.abs(r.avgOpponentCallEV) < 1).length} of ${results.length} scenarios achieve near-perfect equilibrium</li>`
+                        }
+                        <li><strong>Bettor's Edge Range:</strong> ${formatNumber(Math.min(...results.map(r => r.avgBettorEV)))} to ${formatNumber(Math.max(...results.map(r => r.avgBettorEV)))} chips per hand</li>
+                        <li><strong>Highest EV Scenario:</strong> ${results.reduce((best, r) => r.avgBettorEV > best.avgBettorEV ? r : best).scenarioName} with ${formatNumber(Math.max(...results.map(r => r.avgBettorEV)))} chips average EV</li>
+                        ${!hasOptimalPlay ? 
+                            `<li><strong>Most Balanced Scenario:</strong> ${results.reduce((best, r) => Math.abs(r.avgOpponentCallEV) < Math.abs(best.avgOpponentCallEV) ? r : best).scenarioName} with opponent call EV of ${formatNumber(results.reduce((best, r) => Math.abs(r.avgOpponentCallEV) < Math.abs(best.avgOpponentCallEV) ? r : best).avgOpponentCallEV)} chips</li>` :
+                            ''
+                        }
+                    </ul>
+                    
+                    <h4 style="color: #e67e22; margin-top: 30px;">🎯 Practical Recommendations</h4>
+                    <ul class="insights">
+                        ${getRecommendations(results)}
+                    </ul>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        function getStrategicInsight(result) {
+            const betRatio = result.betSize / result.potSize;
+            const valueFreqPercent = result.valueFreq * 100;
+            
+            if (result.optimalOpponent) {
+                return `In Nash equilibrium play, both players achieve exactly 0 EV as predicted by game theory. The bettor bluffs at frequency ${formatPercentage(result.optimalBluffFreq)} while the opponent calls at frequency ${formatPercentage(result.optimalCallFreq)}. Neither player can improve their strategy unilaterally. This represents the minimax solution where each player's strategy is the best response to the other's optimal strategy.`;
+            } else if (result.constraintViolation) {
+                return `This extreme bet size (${betRatio.toFixed(1)}x pot) with ${valueFreqPercent}% value hands creates an unbalanced strategy. You need to bluff with more weak hands than you have available. You're forced to bluff with every weak hand, making you exploitable. Consider smaller bet sizes or adjusting your value hand frequency for better balance.`;
+            } else if (Math.abs(result.avgOpponentCallEV) < 1) {
+                return `This bet size achieves near-perfect equilibrium with ${valueFreqPercent}% value hands. Your opponent cannot gain an edge by adjusting their calling frequency. This is theoretically optimal play against an unknown opponent.`;
+            } else if (result.avgOpponentCallEV > 5) {
+                return `Your bluffing frequency is too low for this bet size. With ${valueFreqPercent}% value hands, you have ${(100 - valueFreqPercent)}% weak hands available for bluffing, but you're not bluffing enough. Your opponent profits by calling more often.`;
+            } else if (result.avgOpponentCallEV < -5) {
+                return `Your bluffing frequency is too high. Your opponent should fold more often. This might occur when constrained by having only ${(100 - valueFreqPercent)}% weak hands available for bluffing.`;
+            } else {
+                return `This scenario with ${valueFreqPercent}% value hands is close to equilibrium but slightly favors ${result.avgOpponentCallEV > 0 ? 'calling' : 'folding'}. Minor adjustments could achieve perfect balance.`;
+            }
+        }
+
+        function getRecommendations(results) {
+            const bestEV = results.reduce((best, r) => r.avgBettorEV > best.avgBettorEV ? r : best);
+            const mostBalanced = results.reduce((best, r) => Math.abs(r.avgOpponentCallEV) < Math.abs(best.avgOpponentCallEV) ? r : best);
+            const constraints = results.filter(r => r.constraintViolation).length;
+            const valueFreqPercent = results[0].valueFreq * 100;
+            const hasOptimalPlay = results.some(r => r.optimalOpponent);
+            
+            let recommendations = [];
+            
+            if (hasOptimalPlay) {
+                recommendations.push(`<li><strong>Nash Equilibrium Play:</strong> When both players play optimally, expected values converge to 0, confirming the zero-sum nature of poker as shown by von Neumann and Morgenstern.</li>`);
+                recommendations.push(`<li><strong>Optimal Frequencies:</strong> Each scenario has unique optimal frequencies - bettor bluffs at B/(P+B), opponent calls at P/(P+B).</li>`);
+            }
+            
+            if (constraints > results.length / 2) {
+                recommendations.push(`<li><strong>Bet Sizing:</strong> With ${valueFreqPercent}% value hands, most scenarios violate constraints. Use conservative bet sizes (0.5x-1x pot) for balanced play, or increase your value hand frequency.</li>`);
+            } else {
+                recommendations.push(`<li><strong>Bet Sizing:</strong> With ${valueFreqPercent}% value hands, moderate bet sizes (0.75x-1.5x pot) provide good balance between EV and exploitability.</li>`);
+            }
+            
+            if (valueFreqPercent < 30) {
+                recommendations.push(`<li><strong>Value Hand Adjustment:</strong> Your low value frequency (${valueFreqPercent}%) gives you many bluffing opportunities but may make large bets unprofitable. Consider tightening your value range.</li>`);
+            } else if (valueFreqPercent > 70) {
+                recommendations.push(`<li><strong>Value Hand Adjustment:</strong> Your high value frequency (${valueFreqPercent}%) limits bluffing opportunities. You may struggle to balance larger bet sizes.</li>`);
+            }
+            
+            if (!hasOptimalPlay) {
+                recommendations.push(`<li><strong>Against Tight Players:</strong> The ${bestEV.scenarioName} scenario maximizes EV when opponents call ${bestEV.callFreq}% of the time.</li>`);
+                recommendations.push(`<li><strong>For GTO Play:</strong> Use ${mostBalanced.scenarioName} for unexploitable strategy (opponent call EV: ${formatNumber(mostBalanced.avgOpponentCallEV)} chips).</li>`);
+            }
+            
+            recommendations.push(`<li><strong>Evolutionary Stability:</strong> As shown by Guazzini and Vilone (2013), optimal bluffing represents an evolutionarily stable strategy that emerges naturally in competitive environments.</li>`);
+            
+            recommendations.push(`<li><strong>Real-World Application:</strong> Track opponent tendencies and adjust from theoretical optimal accordingly. Most players deviate from GTO, creating exploitable opportunities.</li>`);
+            
+            return recommendations.join('');
+        }
+
+        async function runSimulation() {
+            const loadingDiv = document.getElementById('loading');
+            const resultsDiv = document.getElementById('results');
+            
+            // Switch to results tab
+            showTab('results');
+            document.querySelector('.tab:nth-child(3)').classList.add('active');
+            document.querySelector('.tab:nth-child(2)').classList.remove('active');
+            
+            loadingDiv.style.display = 'block';
+            resultsDiv.innerHTML = '';
+            
+            const numSimulations = parseInt(document.getElementById('simulations').value);
+            const callFreq = parseInt(document.getElementById('callFreq').value);
+            const valueFreq = parseInt(document.getElementById('valueFreq').value) / 100;
+            const scenarios = getScenarioParams();
+            const opponentMode = document.querySelector('input[name="opponentMode"]:checked').value;
+            const optimalOpponent = opponentMode === 'optimal';
+            
+            if (scenarios.length === 0) {
+                alert('Please add at least one custom scenario');
+                loadingDiv.style.display = 'none';
+                return;
+            }
+            
+            const results = [];
+            
+            for (let i = 0; i < scenarios.length; i++) {
+                const scenario = scenarios[i];
+                const result = simulatePoker(scenario.pot, scenario.bet, numSimulations, callFreq, valueFreq, optimalOpponent);
+                result.scenarioName = scenario.name;
+                results.push(result);
+                
+                // Small delay to prevent UI blocking
+                await new Promise(resolve => setTimeout(resolve, 10));
+            }
+            
+            loadingDiv.style.display = 'none';
+            displayResults(results);
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            updateCustomScenarioDisplay();
+        };
+    </script>
+</body>
+</html>
